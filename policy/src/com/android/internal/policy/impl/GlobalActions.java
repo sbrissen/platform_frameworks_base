@@ -83,7 +83,10 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
     private final WindowManagerFuncs mWindowManagerFuncs;
 
     private Context mUiContext;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5a35f20... Merge branch 'themes-4.1.1' into cm10
     private final AudioManager mAudioManager;
 
     private ArrayList<Action> mItems;
@@ -347,10 +350,62 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         return dialog;
     }
 
+<<<<<<< HEAD
 /**
 * functions needed for taking screenhots.  
 * This leverages the built in ICS screenshot functionality 
 */
+=======
+    private void createProfileDialog(){
+        final ProfileManager profileManager = (ProfileManager)mContext.getSystemService(Context.PROFILE_SERVICE);
+
+        final Profile[] profiles = profileManager.getProfiles();
+        UUID activeProfile = profileManager.getActiveProfile().getUuid();
+        final CharSequence[] names = new CharSequence[profiles.length];
+
+        int i=0;
+        int checkedItem = 0;
+
+        for(Profile profile : profiles) {
+            if(profile.getUuid().equals(activeProfile)) {
+                checkedItem = i;
+                mChosenProfile = profile;
+            }
+            names[i++] = profile.getName();
+        }
+
+        final AlertDialog.Builder ab = new AlertDialog.Builder(getUiContext());
+
+        AlertDialog dialog = ab
+                .setTitle(R.string.global_action_choose_profile)
+                .setSingleChoiceItems(names, checkedItem, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which < 0)
+                            return;
+                        mChosenProfile = profiles[which];
+                    }
+                })
+                .setPositiveButton(com.android.internal.R.string.yes,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                profileManager.setActiveProfile(mChosenProfile.getUuid());
+                            }
+                        })
+                .setNegativeButton(com.android.internal.R.string.no,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                }).create();
+        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_DIALOG);
+        dialog.show();
+    }
+
+    /**
+     * functions needed for taking screenhots.  
+     * This leverages the built in ICS screenshot functionality 
+     */
+>>>>>>> 5a35f20... Merge branch 'themes-4.1.1' into cm10
     final Object mScreenshotLock = new Object();
     ServiceConnection mScreenshotConnection = null;
 
