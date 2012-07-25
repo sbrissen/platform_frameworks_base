@@ -655,6 +655,21 @@ class ServerThread extends Thread {
                     reportWtf("starting DreamManagerService", e);
                 }
             }
+<<<<<<< HEAD
+=======
+
+            try {
+                Slog.i(TAG, "AssetRedirectionManager Service");
+                ServiceManager.addService("assetredirection", new AssetRedirectionManagerService(context));
+            } catch (Throwable e) {
+                Slog.e(TAG, "Failure starting AssetRedirectionManager Service", e);
+            }
+        }
+
+        // make sure the ADB_ENABLED setting value matches the secure property value
+        Settings.Secure.putInt(mContentResolver, Settings.Secure.ADB_PORT,
+                Integer.parseInt(SystemProperties.get("service.adb.tcp.port", "-1")));
+>>>>>>> 582ea70... Merge branch 'themes-4.1' into cm10
 
             try {
                 Slog.i(TAG, "AssetRedirectionManager Service");
