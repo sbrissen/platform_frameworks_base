@@ -49,6 +49,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.WindowManagerImpl;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RemoteViews;
@@ -114,6 +115,8 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected RecentTasksLoader mRecentTasksLoader;
 
     protected PopupMenu mNotificationBlamePopup;
+
+    protected FrameLayout mStatusBarContainer;
 
     // UI-specific methods
 
@@ -199,6 +202,14 @@ public abstract class BaseStatusBar extends SystemUI implements
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
 
+<<<<<<< HEAD
+=======
+        mStatusBarContainer = new FrameLayout(mContext);
+
+        mShowNotificationCounts = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.STATUS_BAR_NOTIF_COUNT, 0) == 1;
+
+>>>>>>> a13eaee... SystemUI: Move statusbar container object
         // Connect in to the status bar manager service
         StatusBarIconList iconList = new StatusBarIconList();
         ArrayList<IBinder> notificationKeys = new ArrayList<IBinder>();
