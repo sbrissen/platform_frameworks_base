@@ -638,15 +638,9 @@ public class NotificationManagerService extends INotificationManager.Stub
         IntentFilter sdFilter = new IntentFilter(Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE);
         mContext.registerReceiver(mIntentReceiver, sdFilter);
 
-<<<<<<< HEAD
         SettingsObserver observer = new SettingsObserver(mHandler);
         observer.observe();
-=======
-        LEDSettingsObserver ledObserver = new LEDSettingsObserver(mHandler);
-        ledObserver.observe();
-        QuietHoursSettingsObserver qhObserver = new QuietHoursSettingsObserver(mHandler);
-        qhObserver.observe();
->>>>>>> 5a35f20... Merge branch 'themes-4.1.1' into cm10
+
         ThemeUtils.registerThemeChangeReceiver(mContext, mThemeChangeReceiver);
     }
 

@@ -655,10 +655,6 @@ class ServerThread extends Thread {
                     reportWtf("starting DreamManagerService", e);
                 }
             }
-<<<<<<< HEAD
-=======
-
->>>>>>> 5a35f20... Merge branch 'themes-4.1.1' into cm10
             try {
                 Slog.i(TAG, "AssetRedirectionManager Service");
                 ServiceManager.addService("assetredirection", new AssetRedirectionManagerService(context));
