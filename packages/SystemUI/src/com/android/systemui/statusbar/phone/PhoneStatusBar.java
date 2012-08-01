@@ -455,11 +455,6 @@ public class PhoneStatusBar extends BaseStatusBar {
         mScrollView.setVerticalScrollBarEnabled(false); // less drawing during pulldowns
 
         mTicker = new MyTicker(context, mStatusBarView);
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 582ea70... Merge branch 'themes-4.1' into cm10
         TickerView tickerView = (TickerView)mStatusBarView.findViewById(R.id.tickerText);
         tickerView.mTicker = mTicker;
 
