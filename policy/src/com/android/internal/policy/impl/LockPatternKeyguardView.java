@@ -61,8 +61,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityManager;
 
-<<<<<<< HEAD
-=======
 import com.android.internal.R;
 import com.android.internal.policy.impl.KeyguardUpdateMonitor.InfoCallbackImpl;
 import com.android.internal.telephony.IccCard;
@@ -72,7 +70,6 @@ import com.android.internal.widget.TransportControlView;
 
 import com.android.internal.app.ThemeUtils;
 
->>>>>>> a528877... Allow theming of framework UI elements.
 import java.io.IOException;
 
 
