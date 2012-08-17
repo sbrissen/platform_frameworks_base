@@ -74,6 +74,8 @@ import android.net.wifi.IWifiManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.IWifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.net.wimax.WimaxHelper;
+import android.net.wimax.WimaxManagerConstants;
 import android.nfc.NfcManager;
 import android.os.Binder;
 import android.os.Bundle;
@@ -490,6 +492,20 @@ class ContextImpl extends Context {
                 public Object getService(ContextImpl ctx) {
                     return WindowManagerImpl.getDefault(ctx.mPackageInfo.mCompatibilityInfo);
                 }});
+<<<<<<< HEAD
+=======
+
+        registerService(PROFILE_SERVICE, new ServiceFetcher() {
+                public Object createService(ContextImpl ctx) {
+                    final Context outerContext = ctx.getOuterContext();
+                    return new ProfileManager (outerContext, ctx.mMainThread.getHandler());
+                }});
+
+        registerService(WimaxManagerConstants.WIMAX_SERVICE, new ServiceFetcher() {
+                public Object createService(ContextImpl ctx) {
+                    return WimaxHelper.createWimaxService(ctx, ctx.mMainThread.getHandler());
+                }});
+>>>>>>> 7b9939b... Merge "Port wimax support changes from CM9." into jellybean
     }
 
     static ContextImpl getImpl(Context context) {

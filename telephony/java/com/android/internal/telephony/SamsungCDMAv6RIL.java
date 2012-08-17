@@ -66,8 +66,8 @@ public class SamsungCDMAv6RIL extends RIL implements CommandsInterface {
     static final int RIL_UNSOL_DEVICE_READY_NOTI = 11008;
     static final int RIL_UNSOL_GPS_NOTI = 11009;
     static final int RIL_UNSOL_AM = 11010;
-    static final int RIL_UNSOL_SAMSUNG_UNKNOWN_MAGIC_REQUEST = 11012;
-    static final int RIL_UNSOL_SAMSUNG_UNKNOWN_MAGIC_REQUEST_2 = 11011;
+    static final int RIL_UNSOL_DATA_SUSPEND_RESUME = 11012;
+    static final int RIL_UNSOL_DUN_PIN_CONTROL_SIGNAL = 11011;
     static final int RIL_UNSOL_HSDPA_STATE_CHANGED = 11016;
     static final int RIL_REQUEST_DIAL_EMERGENCY = 10016;
 
@@ -77,6 +77,22 @@ public class SamsungCDMAv6RIL extends RIL implements CommandsInterface {
             case RIL_REQUEST_DIAL_EMERGENCY: return "DIAL_EMERGENCY";
             default: return RIL.requestToString(request);
         }
+    }
+
+    static String
+    samsungResponseToString(int request)
+    {
+    switch(request) {
+        // SAMSUNG STATES
+        case RIL_UNSOL_AM: return "RIL_UNSOL_AM";
+        case RIL_UNSOL_DUN_PIN_CONTROL_SIGNAL: return "RIL_UNSOL_DUN_PIN_CONTROL_SIGNAL";
+        case RIL_UNSOL_DATA_SUSPEND_RESUME: return "RIL_UNSOL_DATA_SUSPEND_RESUME";
+        default:  return "<unknown response: "+request+">";
+    }
+}
+
+    protected void samsungUnsljLogRet(int response, Object ret) {
+        riljLog("[UNSL]< " + samsungResponseToString(response) + " " + retToString(response, ret));
     }
 
     @Override
@@ -345,16 +361,13 @@ public class SamsungCDMAv6RIL extends RIL implements CommandsInterface {
         case RIL_UNSOL_SIGNAL_STRENGTH: ret = responseSignalStrength(p); break;
         case RIL_UNSOL_CDMA_INFO_REC: ret = responseCdmaInformationRecord(p); break;
         case RIL_UNSOL_HSDPA_STATE_CHANGED: ret = responseInts(p); break;
-
-        //fixing anoying Exceptions caused by the new Samsung states
-        //FIXME figure out what the states mean an what data is in the parcel
-
         case RIL_UNSOL_O2_HOME_ZONE_INFO: ret = responseVoid(p); break;
         case RIL_UNSOL_DEVICE_READY_NOTI: ret = responseVoid(p); break;
         case RIL_UNSOL_GPS_NOTI: ret = responseVoid(p); break; // Ignored in TW RIL.
-        case RIL_UNSOL_SAMSUNG_UNKNOWN_MAGIC_REQUEST: ret = responseVoid(p); break;
-        case RIL_UNSOL_SAMSUNG_UNKNOWN_MAGIC_REQUEST_2: ret = responseVoid(p); break;
+        // SAMSUNG STATES
         case RIL_UNSOL_AM: ret = responseString(p); break;
+        case RIL_UNSOL_DUN_PIN_CONTROL_SIGNAL: ret = responseVoid(p); break;
+        case RIL_UNSOL_DATA_SUSPEND_RESUME: ret = responseInts(p); break;
         case RIL_UNSOL_RIL_CONNECTED: ret = responseString(p); break;
 
         default:
@@ -447,6 +460,10 @@ public class SamsungCDMAv6RIL extends RIL implements CommandsInterface {
                 }
                 break;
 
+            case RIL_UNSOL_RIL_CONNECTED:
+                // FIXME: Processing this state breaks data call.
+                break;
+            // SAMSUNG STATES
             case RIL_UNSOL_AM:
                 String amString = (String) ret;
                 Log.d(LOG_TAG, "Executing AM: " + amString);
@@ -458,9 +475,11 @@ public class SamsungCDMAv6RIL extends RIL implements CommandsInterface {
                     Log.e(LOG_TAG, "am " + amString + " could not be executed.");
                 }
                 break;
-
-            case RIL_UNSOL_RIL_CONNECTED:
-                // FIXME: Processing this state breaks data call.
+            case RIL_UNSOL_DUN_PIN_CONTROL_SIGNAL:
+                if (RILJ_LOGD) samsungUnsljLogRet(response, ret);
+                break;
+            case RIL_UNSOL_DATA_SUSPEND_RESUME:
+                if (RILJ_LOGD) samsungUnsljLogRet(response, ret);
                 break;
         }
     }
@@ -571,6 +590,15 @@ public class SamsungCDMAv6RIL extends RIL implements CommandsInterface {
     @Override
     protected Object
     responseSignalStrength(Parcel p) {
+	
+        // When SIM is PIN-unlocked, the RIL responds with APPSTATE_UNKNOWN and
+        // does not follow up with RIL_UNSOL_RESPONSE_SIM_STATUS_CHANGED. We
+        // notify the system here.
+        String state = SystemProperties.get(TelephonyProperties.PROPERTY_SIM_STATE);
+        if ("NOT_READY".equals(state) && mIccStatusChangedRegistrants != null) {
+            mIccStatusChangedRegistrants.notifyRegistrants();
+        }
+		
         int numInts = 12;
         int response[];
 
@@ -586,8 +614,8 @@ public class SamsungCDMAv6RIL extends RIL implements CommandsInterface {
         // Scale cdmaDbm so Samsung's -95..-105 range for SIGNAL_STRENGTH_POOR
         // fits in AOSP's -95..-100 range
         if(response[2] > 95){
-        //   Log.d(LOG_TAG, "SignalStrength: Scaling cdmaDbm \"" + response[2] + "\" for smaller SIGNAL_STRENGTH_POOR bucket.");
-           response[2] = ((response[2]-96)/2)+96;
+           Log.d(LOG_TAG, "SignalStrength: Scaling cdmaDbm \"" + response[2] + "\" for smaller SIGNAL_STRENGTH_POOR bucket.");
+          response[2] = ((response[2]-96)/2)+96;
         }
         // Framework takes care of the rest for us.
         return response;

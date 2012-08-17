@@ -664,15 +664,8 @@ class ServerThread extends Thread {
         }
 
         // make sure the ADB_ENABLED setting value matches the secure property value
-        Settings.Secure.putInt(mContentResolver, Settings.Secure.ADB_PORT,
-                Integer.parseInt(SystemProperties.get("service.adb.tcp.port", "-1")));
-            try {
-                Slog.i(TAG, "AssetRedirectionManager Service");
-                ServiceManager.addService("assetredirection", new AssetRedirectionManagerService(context));
-            } catch (Throwable e) {
-                Slog.e(TAG, "Failure starting AssetRedirectionManager Service", e);
-            }
-        }
+       // Settings.Secure.putInt(mContentResolver, Settings.Secure.ADB_PORT,
+             //   Integer.parseInt(SystemProperties.get("service.adb.tcp.port", "-1")));
 
         // Before things start rolling, be sure we have decided whether
         // we are in safe mode.
