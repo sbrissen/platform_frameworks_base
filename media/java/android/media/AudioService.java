@@ -67,11 +67,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.VolumePanel;
-<<<<<<< HEAD
-=======
 import android.provider.Settings.SettingNotFoundException;
 import android.content.res.Resources;
->>>>>>> deec8a3... Audioservice: fix A2dp support on Samsung's Audio Policy HAL.
 
 import com.android.internal.app.ThemeUtils;
 import com.android.internal.telephony.ITelephony;
@@ -280,6 +277,28 @@ public class AudioService extends IAudioService.Stub implements OnFinished {
             "STREAM_TTS"
     };
 
+    // Add separate headset and speaker volumes
+    private static final String[] STREAM_VOLUME_HEADSET_SETTINGS = new String[] {
+        "AudioService.SAVED_VOICE_CALL_HEADSET_VOL",
+        "AudioService.SAVED_SYSTEM_HEADSET_VOL",
+        "AudioService.SAVED_RING_HEADSET_VOL",
+        "AudioService.SAVED_MUSIC_HEADSET_VOL",
+        "AudioService.SAVED_ALARM_HEADSET_VOL",
+        "AudioService.SAVED_NOTIFICATION_HEADSET_VOL",
+    };
+
+    private static final String[] STREAM_VOLUME_SPEAKER_SETTINGS = new String[] {
+        "AudioService.SAVED_VOICE_CALL_SPEAKER_VOL",
+        "AudioService.SAVED_SYSTEM_SPEAKER_VOL",
+        "AudioService.SAVED_RING_SPEAKER_VOL",
+        "AudioService.SAVED_MUSIC_SPEAKER_VOL",
+        "AudioService.SAVED_ALARM_SPEAKER_VOL",
+        "AudioService.SAVED_NOTIFICATION_SPEAKER_VOL",
+    };
+
+    private static final int HEADSET_VOLUME_RESTORE_CAP_VOICE_CALL = 3; // Out of 5
+    private static final int HEADSET_VOLUME_RESTORE_CAP_MUSIC = 8; // Out of 15
+    private static final int HEADSET_VOLUME_RESTORE_CAP_OTHER = 4; // Out of 7
     private final AudioSystem.ErrorCallback mAudioSystemCallback = new AudioSystem.ErrorCallback() {
         public void onError(int error) {
             switch (error) {
@@ -481,6 +500,7 @@ public class AudioService extends IAudioService.Stub implements OnFinished {
         intentFilter.addAction(Intent.ACTION_BOOT_COMPLETED);
         intentFilter.addAction(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+		intentFilter.addAction(Intent.ACTION_HEADSET_PLUG);
 
         // Register a configuration change listener only if requested by system properties
         // to monitor orientation changes (off by default)
@@ -3487,8 +3507,6 @@ public class AudioService extends IAudioService.Stub implements OnFinished {
                         }
                     }
                 }
-<<<<<<< HEAD
-=======
             } else if (action.equals(Intent.ACTION_HEADSET_PLUG)) {
                 //Save and restore volumes for headset and speaker
                 state = intent.getIntExtra("state", 0);
@@ -3498,8 +3516,6 @@ public class AudioService extends IAudioService.Stub implements OnFinished {
                     if (noDelayInATwoDP)
                         setBluetoothA2dpOnInt(false);
                     // Headset plugged in
-                    final boolean capVolumeRestore = Settings.System.getInt(mContentResolver,
-                            Settings.System.SAFE_HEADSET_VOLUME_RESTORE, 1) == 1;
                     for (int stream = 0; stream < STREAM_VOLUME_HEADSET_SETTINGS.length; stream++) {
                         final int streamAlias = mStreamVolumeAlias[stream];
                         // Save speaker volume
@@ -3513,27 +3529,7 @@ public class AudioService extends IAudioService.Stub implements OnFinished {
                             lastVolume = -1;
                         }
                         if (lastVolume >= 0) {
-                            if (capVolumeRestore) {
-                                final int volumeCap;
-                                switch (streamAlias) {
-                                    case AudioSystem.STREAM_VOICE_CALL:
-                                        volumeCap = HEADSET_VOLUME_RESTORE_CAP_VOICE_CALL;
-                                        break;
-                                    case AudioSystem.STREAM_MUSIC:
-                                        volumeCap = HEADSET_VOLUME_RESTORE_CAP_MUSIC;
-                                        break;
-                                    case AudioSystem.STREAM_SYSTEM:
-                                    case AudioSystem.STREAM_RING:
-                                    case AudioSystem.STREAM_ALARM:
-                                    case AudioSystem.STREAM_NOTIFICATION:
-                                    default:
-                                        volumeCap = HEADSET_VOLUME_RESTORE_CAP_OTHER;
-                                        break;
-                                }
-                                setStreamVolume(streamAlias, Math.min(volumeCap, lastVolume), 0);
-                            } else {
                                 setStreamVolume(streamAlias, lastVolume, 0);
-                            }
                         }
                     }
                 } else {
@@ -3559,7 +3555,6 @@ public class AudioService extends IAudioService.Stub implements OnFinished {
                             setStreamVolume(streamAlias, lastVolume, 0);
                     }
                 }
->>>>>>> deec8a3... Audioservice: fix A2dp support on Samsung's Audio Policy HAL.
             } else if (action.equals(Intent.ACTION_USB_AUDIO_ACCESSORY_PLUG) ||
                            action.equals(Intent.ACTION_USB_AUDIO_DEVICE_PLUG)) {
                 state = intent.getIntExtra("state", 0);

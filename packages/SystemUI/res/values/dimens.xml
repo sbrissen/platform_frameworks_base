@@ -150,4 +150,10 @@
 
     <!-- Height of the carrier/wifi name label -->
     <dimen name="carrier_label_height">24dp</dimen>
+
+    <!-- Height of the notification panel widget bar -->
+    <dimen name="notification_panel_widget_height">48dp</dimen>
+
+    <!-- Height of the notification panel header and widget -->
+    <dimen name="notification_panel_header_and_widget">96dp</dimen>
 </resources>

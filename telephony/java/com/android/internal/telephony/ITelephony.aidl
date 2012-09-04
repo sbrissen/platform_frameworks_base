@@ -43,6 +43,12 @@ interface ITelephony {
      * @param number the number to be called.
      */
     void call(String number);
+	
+    /**
+     * Toggle between 3G and LTE (NT_MODE_CDMA, NT_MODE_GLOBAL)
+     * @param boolean to turn on and off LTE
+     */
+    void toggleLTE(boolean on);
 
     /**
      * If there is currently a call in progress, show the call screen.

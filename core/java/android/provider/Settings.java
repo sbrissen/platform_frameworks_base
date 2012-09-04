@@ -1826,6 +1826,9 @@ public final class Settings {
          * @hide
          */
         public static final String TTY_MODE = "tty_mode";
+		
+
+		public static final String NOISE_SUPPRESSION = "noise_supression";
 
         /**
          * Whether the sounds effects (key clicks, lid open ...) are enabled. The value is
@@ -2000,6 +2003,79 @@ public final class Settings {
          * @hide
          */
         public static final String POINTER_SPEED = "pointer_speed";
+		
+        /**
+         * Use the Notification Power Widget? (Who wouldn't!)
+         *
+         * @hide
+         */
+        public static final String EXPANDED_VIEW_WIDGET = "expanded_view_widget";
+
+        /**
+         * Whether to hide the notification screen after clicking on a widget
+         * button
+         *
+         * @hide
+         */
+        public static final String EXPANDED_HIDE_ONCHANGE = "expanded_hide_onchange";
+
+        /**
+         * Hide scroll bar in power widget
+         *
+         * @hide
+         */
+        public static final String EXPANDED_HIDE_SCROLLBAR = "expanded_hide_scrollbar";
+
+        /**
+         * Haptic feedback in power widget
+         *
+         * @hide
+         */
+        public static final String EXPANDED_HAPTIC_FEEDBACK = "expanded_haptic_feedback";
+
+        /**
+         * Widget Buttons to Use
+         *
+         * @hide
+         */
+        public static final String WIDGET_BUTTONS = "expanded_widget_buttons";
+
+        /**
+        * Notification Power Widget - Custom Brightness Mode
+        * @hide
+        */
+        public static final String EXPANDED_BRIGHTNESS_MODE = "expanded_brightness_mode";
+
+        /**
+        * Notification Power Widget - Custom Network Mode
+        * @hide
+        */
+        public static final String EXPANDED_NETWORK_MODE = "expanded_network_mode";
+
+        /**
+         * Notification Power Widget - Custom LTE Toggle
+         * 1 - lte on, 0 - lte off
+         * @hide
+         */
+        public static final String LTE_MODE = "lte_mode";
+
+        /**
+        * Notification Power Widget - Custom Screen Timeout
+        * @hide
+        */
+        public static final String EXPANDED_SCREENTIMEOUT_MODE = "expanded_screentimeout_mode";
+
+        /**
+        * Notification Power Widget - Custom Ring Mode
+        * @hide
+        */
+        public static final String EXPANDED_RING_MODE = "expanded_ring_mode";
+
+        /**
+        * Notification Power Widget - Custom Torch Mode
+        * @hide
+        */
+        public static final String EXPANDED_FLASH_MODE = "expanded_flash_mode";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -3331,6 +3407,12 @@ public final class Settings {
         public static final String WIFI_MOBILE_DATA_TRANSITION_WAKELOCK_TIMEOUT_MS =
             "wifi_mobile_data_transition_wakelock_timeout_ms";
 
+		/**
+         * Whether the Wimax should be on.  Only the WiMAX service should touch this.
+         * @hide
+         */
+        public static final String WIMAX_ON = "wimax_on";
+
         /**
          * Whether network service discovery is enabled.
          * @hide
@@ -4305,7 +4387,7 @@ public final class Settings {
          * @hide
          */
         public static final String SMS_SHORT_CODES_PREFIX = "sms_short_codes_";
-
+		
         /**
          * This are the settings to be backed up.
          *

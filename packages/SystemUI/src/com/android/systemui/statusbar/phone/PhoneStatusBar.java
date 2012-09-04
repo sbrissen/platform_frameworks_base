@@ -29,12 +29,14 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.content.res.CustomTheme;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
@@ -43,7 +45,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.inputmethodservice.InputMethodService;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.IPowerManager;
 import android.os.Message;
 import android.os.RemoteException;
 import android.os.ServiceManager;
@@ -56,11 +60,13 @@ import android.util.Slog;
 import android.view.Choreographer;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
 import android.view.IWindowManager;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
@@ -77,6 +83,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.statusbar.StatusBarNotification;
+import com.android.systemui.statusbar.powerwidget.PowerWidget;
 import com.android.systemui.R;
 import com.android.systemui.recent.RecentTasksLoader;
 import com.android.systemui.statusbar.BaseStatusBar;
@@ -208,6 +215,8 @@ public class PhoneStatusBar extends BaseStatusBar {
     int mTrackingPosition; // the position of the top of the tracking view.
     private boolean mPanelSlightlyVisible;
 
+    // the power widget
+    PowerWidget mPowerWidget;
     // ticker
     private Ticker mTicker;
     private View mTickerView;
@@ -401,7 +410,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         try {
             boolean showNav = mWindowManager.hasNavigationBar();
             if (DEBUG) Slog.v(TAG, "hasNavigationBar=" + showNav);
-            if (showNav) {
+            if (showNav && !mRecreating) {
                 mNavigationBarView =
                     (NavigationBarView) View.inflate(context, R.layout.navigation_bar, null);
 
@@ -420,6 +429,10 @@ public class PhoneStatusBar extends BaseStatusBar {
         mIcons = (LinearLayout)mStatusBarView.findViewById(R.id.icons);
         mTickerView = mStatusBarView.findViewById(R.id.ticker);
 
+        /* Destroy the old widget before recreating the expanded dialog
+           to make sure there are no context issues */
+        if (mRecreating)
+            mPowerWidget.destroyWidget();
         mPile = (NotificationRowLayout)mStatusBarWindow.findViewById(R.id.latestItems);
         mPile.setLayoutTransitionsEnabled(false);
         mPile.setLongPressListener(getNotificationLongClicker());
@@ -449,6 +462,21 @@ public class PhoneStatusBar extends BaseStatusBar {
         mScrollView = (ScrollView)mStatusBarWindow.findViewById(R.id.scroll);
         mScrollView.setVerticalScrollBarEnabled(false); // less drawing during pulldowns
 
+        mPowerWidget = (PowerWidget)mStatusBarWindow.findViewById(R.id.exp_power_stat);
+        mPowerWidget.setGlobalButtonOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        if(Settings.System.getInt(mContext.getContentResolver(),
+                                Settings.System.EXPANDED_HIDE_ONCHANGE, 0) == 1) {
+                            animateCollapse();
+                        }
+                    }
+                });
+        mPowerWidget.setGlobalButtonOnLongClickListener(new View.OnLongClickListener() {
+            public boolean onLongClick(View v) {
+                animateCollapse();
+                return true;
+            }
+        });
         mTicker = new MyTicker(context, mStatusBarView);
         TickerView tickerView = (TickerView)mStatusBarView.findViewById(R.id.tickerText);
         tickerView.mTicker = mTicker;
@@ -499,6 +527,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         context.registerReceiver(mBroadcastReceiver, filter);
 
+		mPowerWidget.setupWidget();
         return mStatusBarView;
     }
 
@@ -723,6 +752,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         StatusBarIconView view = new StatusBarIconView(mContext, slot, null);
         view.set(icon);
         mStatusIcons.addView(view, viewIndex, new LinearLayout.LayoutParams(mIconSize, mIconSize));
+		mPowerWidget.updateAllButtons();
     }
 
     public void updateIcon(String slot, int index, int viewIndex,
@@ -2345,11 +2375,12 @@ public class PhoneStatusBar extends BaseStatusBar {
         copyNotifications(notifications, mNotificationData);
         mNotificationData.clear();
 
-        if (mNavigationBarView != null) {
-            WindowManagerImpl.getDefault().removeView(mNavigationBarView);
-        }
+       // if (mNavigationBarView != null) {
+      //      WindowManagerImpl.getDefault().removeView(mNavigationBarView);
+      //  }
         makeStatusBarView();
-        addNavigationBar();
+       // addNavigationBar();
+		repositionNavigationBar();
 
         // recreate StatusBarIconViews.
         for (int i = 0; i < nIcons; i++) {

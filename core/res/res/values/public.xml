@@ -3653,33 +3653,9 @@
   <public type="style" name="Widget.DeviceDefault.MediaRouteButton" id="0x010301d7" />
   <public type="style" name="Widget.DeviceDefault.Light.MediaRouteButton" id="0x010301d8" />
 
-<<<<<<< HEAD
-=======
-<!-- ===============================================================
-   Resources added in version 10 of CyanogenMod
-   =============================================================== -->
-  <eat-comment />
-
-  <!-- Config.xml entries -->
-  <java-symbol type="string" name="config_legacyUmsLunFile" />
-  <java-symbol type="bool" name="config_forceDisableHardwareKeyboard" />
-  <java-symbol type="array" name="config_telephony_set_audioparameters" />
-  <java-symbol type="bool" name="config_autoBrightnessButtonKeyboard" />
-  <java-symbol type="string" name="config_deviceKeyHandlerLib" />
-  <java-symbol type="string" name="config_deviceKeyHandlerClass" />
-  <java-symbol type="integer" name="config_screenOnAnimation" />
-  <java-symbol type="integer" name="config_backKillTimeout" />
-  <java-symbol type="bool" name="config_screenOffAnimation" />
-  <java-symbol type="bool" name="config_hasRotationLockSwitch" />
-  <java-symbol type="bool" name="config_hasDockBattery" />
   <java-symbol type="bool" name="config_noDelayInATwoDP" />
 
-  <!-- Notification and battery light -->
-  <java-symbol type="bool" name="config_intrusiveBatteryLed" />
-  <java-symbol type="bool" name="config_multiColorBatteryLed" />
-  <java-symbol type="array" name="notification_light_package_mapping" />
 
->>>>>>> deec8a3... Audioservice: fix A2dp support on Samsung's Audio Policy HAL.
   <!-- Power menu -->
   <java-symbol type="string" name="global_action_screenshot" />
   <java-symbol type="string" name="global_action_reboot" />
@@ -3690,4 +3666,11 @@
   <java-symbol type="array" name="shutdown_reboot_actions" />
   <java-symbol type="drawable" name="ic_lock_screenshot" />
   <java-symbol type="drawable" name="ic_lock_reboot" />
+  <!-- Power widget -->
+  <java-symbol type="string" name="hour" />
+  <java-symbol type="string" name="hours" />
+  <java-symbol type="string" name="minute" />
+  <java-symbol type="string" name="minutes" />
+  <java-symbol type="string" name="second" />
+  <java-symbol type="string" name="seconds" />
 </resources>
